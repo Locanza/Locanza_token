@@ -171,46 +171,44 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
     function transferFrom(address _from, address _to, uint _value, bytes _data)
         public
         returns (bool) {
-        if (_allowances[_from][msg.sender] > 0 && 
+        require (_allowances[_from][msg.sender] > 0 && 
             _value > 0 &&
             _allowances[_from][msg.sender] >= _value &&
-            _balanceOf[_from] >= _value) {
+            _balanceOf[_from] >= _value); 
 
-              _allowances[_from][msg.sender] -= _value;
+        _allowances[_from][msg.sender] = _allowances[_from][msg.sender].sub(_value);
+        _balanceOf[_from] = _balanceOf[_from].sub(_value);
+        _balanceOf[_to] = _balanceOf[_to].add(_value);
 
-              if (_to.isContract()) {
-                ERC223ReceivingContract _contract = ERC223ReceivingContract(_to);
-                _contract.tokenFallback(msg.sender, _value, _data);
+        if (_to.isContract()) {
+            ERC223ReceivingContract _contract = ERC223ReceivingContract(_to);
+            _contract.tokenFallback(msg.sender, _value, _data);
               }
 
-            _balanceOf[_from] = _balanceOf[_from].sub(_value);
-            _balanceOf[_to] = _balanceOf[_to].add(_value);
+        emit Transfer(_from, _to, _value);
 
-            emit Transfer(_from, _to, _value);
-
-            return true;
-        }
-        return false;
+        return true;
+        
     }
-
+// checked
     function approve(address _spender, uint _value)
         public
         returns (bool) {
-        if (_balanceOf[msg.sender] >= _value) {
+        if (_balanceOf[msg.sender] >= _value && _value >= 0) {
             _allowances[msg.sender][_spender] = _value;
             emit Approval(msg.sender, _spender, _value);
             return true;
         }
         return false;
     }
-
+// checked
     function allowance(address _owner, address _spender)
         public
         view
         returns (uint) {
-        if (_allowances[_owner][_spender] < _balanceOf[_owner]) {
-            return _allowances[_owner][_spender];
-        }
-        return _balanceOf[_owner];
+        // if (_allowances[_owner][_spender] < _balanceOf[_owner]) {
+        return _allowances[_owner][_spender];
+        // }
+        // return _balanceOf[_owner];
     }
 }
