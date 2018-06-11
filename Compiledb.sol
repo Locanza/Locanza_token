@@ -168,6 +168,7 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
         return transferFrom(_from, _to, _value, "");
     }
 
+//checked
     function transferFrom(address _from, address _to, uint _value, bytes _data)
         public
         returns (bool) {
