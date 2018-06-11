@@ -200,9 +200,8 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
         public
         view
         returns (uint) {
-        // if (_allowances[_owner][_spender] < _balanceOf[_owner]) {
+        
         return _allowances[_owner][_spender];
-        // }
-        // return _balanceOf[_owner];
+       
     }
 }
