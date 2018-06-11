@@ -1,4 +1,4 @@
-## Locanza token sourcecode
+## Locanza token 
 
 Locanza token is a basic token with **ERC20/ERC223** functionality.
 The token is extended with a Lock functionality.
