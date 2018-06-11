@@ -115,53 +115,52 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
 
     using SafeMath for uint;
     using Addresses for address;
-
+    
+//checked
     constructor()
         public {
         _balanceOf[msg.sender] = _totalSupply;
     }
-
+//checked
     function totalSupply()
         public
         view
         returns (uint) {
         return _totalSupply;
     }
-
+//checked
     function balanceOf(address _addr)
         public
         view
         returns (uint) {
         return _balanceOf[_addr];
     }
-
+//checked
     function transfer(address _to, uint _value)
         public
         returns (bool) {
         return transfer(_to, _value, "");
     }
-
+//checked
     function transfer(address _to, uint _value, bytes _data)
         public
         returns (bool) {
-        if (_value > 0 &&
-            _value <= _balanceOf[msg.sender]) {
+        require (_value > 0 &&
+            _value <= _balanceOf[msg.sender]); 
+        
+        _balanceOf[msg.sender] = _balanceOf[msg.sender].sub(_value);
+        _balanceOf[_to] = _balanceOf[_to].add(_value);
 
             if (_to.isContract()) {
                 ERC223ReceivingContract _contract = ERC223ReceivingContract(_to);
                 _contract.tokenFallback(msg.sender, _value, _data);
             }
+  
+        emit Transfer(msg.sender, _to, _value);
 
-            _balanceOf[msg.sender] = _balanceOf[msg.sender].sub(_value);
-            _balanceOf[_to] = _balanceOf[_to].add(_value);
-            
-            emit Transfer(msg.sender, _to, _value);
-
-            return true;
-        }
         return false;
     }
-
+//checked
     function transferFrom(address _from, address _to, uint _value)
         public
         returns (bool) {
