@@ -121,14 +121,6 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
         public {
         _balanceOf[msg.sender] = _totalSupply;
     }
-    
-//checked and deleted
-//    function totalSupply()
-//        public
-//        view
-//        returns (uint) {
-//        return _totalSupply;
-//    }
 
 //checked
     function balanceOf(address _addr)
