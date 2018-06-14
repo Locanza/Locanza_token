@@ -10,7 +10,7 @@ Simple tasklist
 - [x] Create basic token
 - [x] Truffle test
 - [x] Ropsten test
-- Final review
+- [x] Final review
 - Live.
 
 Team Locanza.
