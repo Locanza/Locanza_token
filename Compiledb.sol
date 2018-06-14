@@ -295,8 +295,8 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
     }
 
     function lockedBalance() public view returns(uint,uint,uint){
-        require(_Locked[msg.sender].Locked == true);
-        return (_Locked[msg.sender].amount,_Locked[msg.sender].lockedDate,_Locked[msg.sender].daysLocked) ;
+        
+        return (_Locked[owner].amount,_Locked[owner].lockedDate,_Locked[owner].daysLocked) ;
     }
 
 // This functions adds te locked tokens to the owner balance
