@@ -278,6 +278,7 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
 
     function lockOwnerBalance( uint _amount, uint _days) public onlyOwner returns(bool) {
    // max 1 year lock only
+        require(_amount > 0);
         require(_days > 30 && _days <= 365);
         require(_balanceOf[msg.sender] >= _amount);
    // only one token lock (per stage) is possible
