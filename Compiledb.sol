@@ -116,9 +116,46 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
     using SafeMath for uint;
     using Addresses for address;
 
+    address owner;
+
+    struct lockDetail {
+        uint amount;
+        uint lockedDate;
+        uint daysLocked;
+        bool Locked;
+    }
+
+// to keep track of the minting stages
+// The meaning of the 5 stages have yet to be determined
+// minting will be done after 25 years or earlier when mining bounties are relevant
+
+    enum Stages {
+        FirstLoyaltyProgram,
+        Stage1,
+        Stage2,
+        Stage3,
+        Stage4,
+        Stage5
+    }
+    Stages internal stage = Stages.FirstLoyaltyProgram;
+
+// Locked Balance + Balance = total _totalsupply
+    mapping(address=>lockDetail)  _Locked;
+
+//Lock event
+    event Locked(address _locker, uint _amount);
+// Unlock event
+    event Unlock(address _receiver, uint _amount);
+
+    modifier onlyOwner () {
+        require (owner == msg.sender);
+        _;
+    }
+
 //checked
     constructor()
         public {
+        owner = msg.sender;
         _balanceOf[msg.sender] = _totalSupply;
     }
 
@@ -152,7 +189,7 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
   
         emit Transfer(msg.sender, _to, _value);
 
-        return false;
+        return true;
     }
 //checked
     function transferFrom(address _from, address _to, uint _value)
@@ -204,4 +241,92 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
         return _allowances[_owner][_spender];
        
     }
+
+// minting and locking functionality
+
+
+// Minted coins are added to the total supply
+// Minted coins have to be locked between 30 and 365 to protect tokenholders
+// Only minting sets a new stage (first stage is the FirstLoyaltyProgram after initial token creation)
+
+    function coinMinter (uint _amount, uint _days) public onlyOwner  returns (bool) {
+        require(_amount > 0);
+        // max 1 year lock only
+        require(_days > 30 && _days <= 365);
+    // this is where we eventualy set the total supply
+        require (_amount + _totalSupply <= 10000000000000000);
+        _totalSupply += _amount;
+        stage = Stages(uint(stage)+1);
+        lockAfterMinting(_amount, _days);
+        return true;
+    }
+// Only one stage at a time can be minted
+// Because of the internal call to lockAfterMinting
+
+    function lockAfterMinting( uint _amount, uint _days) internal onlyOwner returns(bool) {
+     // only one token lock (per stage) is possible
+        require(_amount > 0);
+        require(_days > 30 && _days <= 365);
+        require(_Locked[msg.sender].Locked != true);
+        _Locked[msg.sender].amount = _amount;
+        _Locked[msg.sender].lockedDate = now;
+        _Locked[msg.sender].daysLocked = _days;
+        _Locked[msg.sender].Locked = true;
+        emit Locked(msg.sender, _amount);
+        return true;
+    }
+
+    function lockOwnerBalance( uint _amount, uint _days) public onlyOwner returns(bool) {
+   // max 1 year lock only
+        require(_days > 30 && _days <= 365);
+        require(_balanceOf[msg.sender] >= _amount);
+   // only one token lock (per stage) is possible
+        require(_Locked[msg.sender].Locked != true);
+  // extract tokens from the owner balance
+        _balanceOf[msg.sender] -= _amount;
+
+        _Locked[msg.sender].amount = _amount;
+        _Locked[msg.sender].lockedDate = now;
+        _Locked[msg.sender].daysLocked = _days;
+        _Locked[msg.sender].Locked = true;
+        emit Locked(msg.sender, _amount);
+        return true;
+    }
+
+    function lockedBalance() public view returns(uint,uint,uint){
+        require(_Locked[msg.sender].Locked == true);
+        return (_Locked[msg.sender].amount,_Locked[msg.sender].lockedDate,_Locked[msg.sender].daysLocked) ;
+    }
+
+// This functions adds te locked tokens to the owner balance
+    function unlockOwnerBalance() public onlyOwner returns(bool){
+
+        require(_Locked[msg.sender].Locked == true);
+// require statement regarding the date time require for unlock
+// for testing purposes only in seconds
+        require(now > _Locked[msg.sender].lockedDate + _Locked[msg.sender].daysLocked * 1 days);
+        _balanceOf[msg.sender] += _Locked[msg.sender].amount;
+        delete _Locked[msg.sender];
+
+        emit Unlock(msg.sender, _Locked[msg.sender].amount);
+        return true;
+    }
+
+    function getStage() public view returns(string){
+
+        if (uint(stage)==0) {
+            return "FirstLoyalty";
+        } else if(uint(stage)==1){
+            return "Stage1";
+         } else if (uint(stage)==2){
+            return "Stage2";
+        }  else if(uint(stage)==3){
+            return "Stage3" ;
+        } else if(uint(stage)==4){
+            return "Stage4" ;
+        }else if(uint(stage)==5){
+            return "Stage5" ;
+        }
+    }
+
 }
