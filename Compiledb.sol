@@ -227,12 +227,10 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
     function approve(address _spender, uint _value)
         public
         returns (bool) {
-        if (_balanceOf[msg.sender] >= _value && _value >= 0) {
+        require (_balanceOf[msg.sender] >= _value && _value >= 0); 
             _allowances[msg.sender][_spender] = _value;
             emit Approval(msg.sender, _spender, _value);
             return true;
-        }
-        return false;
     }
 // checked
     function allowance(address _owner, address _spender)
