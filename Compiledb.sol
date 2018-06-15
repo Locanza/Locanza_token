@@ -182,12 +182,14 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
         _balanceOf[msg.sender] = _balanceOf[msg.sender].sub(_value);
         _balanceOf[_to] = _balanceOf[_to].add(_value);
 
+        emit Transfer(msg.sender, _to, _value);
+
             if (_to.isContract()) {
                 ERC223ReceivingContract _contract = ERC223ReceivingContract(_to);
                 _contract.tokenFallback(msg.sender, _value, _data);
             }
   
-        emit Transfer(msg.sender, _to, _value);
+        
 
         return true;
     }
@@ -211,12 +213,12 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
         _balanceOf[_from] = _balanceOf[_from].sub(_value);
         _balanceOf[_to] = _balanceOf[_to].add(_value);
 
+        emit Transfer(_from, _to, _value);
+
         if (_to.isContract()) {
             ERC223ReceivingContract _contract = ERC223ReceivingContract(_to);
             _contract.tokenFallback(msg.sender, _value, _data);
               }
-
-        emit Transfer(_from, _to, _value);
 
         return true;
         
