@@ -143,9 +143,9 @@ contract MyToken is Token("LOCA", "Locanza", 8, 5000000000000000), ERC20, ERC223
     mapping(address=>lockDetail)  _Locked;
 
 //Lock event
-    event Locked(address _locker, uint _amount);
+    event Locked(address indexed _locker, uint _amount);
 // Unlock event
-    event Unlock(address _receiver, uint _amount);
+    event Unlock(address indexed _receiver, uint _amount);
 
     modifier onlyOwner () {
         require (owner == msg.sender);
