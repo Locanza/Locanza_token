@@ -11,6 +11,6 @@ Simple tasklist
 - [x] Truffle test
 - [x] Ropsten test
 - [x] Final review
-- Live.
+- [x] Live.
 
 Team Locanza.
